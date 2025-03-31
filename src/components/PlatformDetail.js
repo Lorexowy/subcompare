@@ -20,6 +20,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 
+import FeaturesTable from '../components/FeaturesTable'
 import subscriptions from '../data/subscriptions'
 import promotions from '../data/promotions'
 
@@ -831,57 +832,9 @@ export default function PlatformDetail({ params }) {
               <div className="mt-12">
                 <h3 className="heading-md mb-6">Dostępne funkcje w różnych planach</h3>
                 
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-dark-100">
-                      <tr>
-                        <th className="p-4 text-left font-medium">Funkcja</th>
-                        {platformSubscriptions.map(sub => (
-                          <th key={sub.id} className="p-4 text-center font-medium">{sub.name}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-dark-100">
-                        <td className="p-4 font-medium">Jakość wideo</td>
-                        {platformSubscriptions.map(sub => (
-                          <td key={sub.id} className="p-4 text-center">{sub.resolution}</td>
-                        ))}
-                      </tr>
-                      <tr className="border-b border-dark-100">
-                        <td className="p-4 font-medium">Liczba ekranów</td>
-                        {platformSubscriptions.map(sub => (
-                          <td key={sub.id} className="p-4 text-center">{sub.screens}</td>
-                        ))}
-                      </tr>
-                      <tr className="border-b border-dark-100">
-                        <td className="p-4 font-medium">Pobieranie offline</td>
-                        {platformSubscriptions.map(sub => (
-                          <td key={sub.id} className="p-4 text-center">
-                            {renderBoolean(sub.offlineViewing)}
-                          </td>
-                        ))}
-                      </tr>
-                      <tr className="border-b border-dark-100">
-                        <td className="p-4 font-medium">Bez reklam</td>
-                        {platformSubscriptions.map(sub => (
-                          <td key={sub.id} className="p-4 text-center">
-                            {renderBoolean(sub.adsFree)}
-                          </td>
-                        ))}
-                      </tr>
-                      <tr className="border-b border-dark-100">
-                        <td className="p-4 font-medium">Okres próbny</td>
-                        {platformSubscriptions.map(sub => (
-                          <td key={sub.id} className="p-4 text-center">
-                            {sub.trialPeriod > 0 ? `${sub.trialPeriod} dni` : 'Brak'}
-                          </td>
-                        ))}
-                      </tr>
-                    </tbody>
-                  </table>
+                {/* Używamy nowego komponentu FeaturesTable */}
+                <FeaturesTable subscriptions={platformSubscriptions} />
                 </div>
-              </div>
             </div>
           )}
           
