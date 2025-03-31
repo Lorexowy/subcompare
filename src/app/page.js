@@ -1,3 +1,10 @@
+'use client'
+
+import HeroSection from '../components/HeroSection'
+import CategoriesSection from '../components/CategoriesSection'
+import Link from 'next/link'
+
+
 export default function Home() {
   // Przykładowe subskrypcje
   const popularSubscriptions = [
@@ -180,51 +187,10 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-800 to-gray-900 py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Porównaj i wybierz <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-500">najlepsze subskrypcje</span>
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto">
-            Oszczędzaj czas i pieniądze porównując popularne serwisy streamingowe, muzyczne i gamingowe w jednym miejscu.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="/compare" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200 text-center">
-              Porównaj subskrypcje
-            </a>
-            <a href="/calculator" className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200 text-center">
-              Znajdź idealny pakiet
-            </a>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Kategorie */}
-      <section className="py-12 px-4 md:px-8 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">Przeszukaj według kategorii</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8">
-            {[
-              { name: "Streaming wideo", icon: "📺", slug: "streaming" },
-              { name: "Streaming muzyczny", icon: "🎵", slug: "music" },
-              { name: "Gry", icon: "🎮", slug: "gaming" },
-              { name: "Audiobooki", icon: "📚", slug: "audiobooks" },
-              { name: "Sport", icon: "⚽", slug: "sport" }
-            ].map((category, index) => (
-              <a 
-                key={index} 
-                href={`/compare?category=${category.slug}`} 
-                className="bg-gray-700 rounded-lg p-6 text-center hover:bg-gray-600 transition-colors duration-200"
-              >
-                <div className="flex flex-col items-center">
-                  <div className="text-4xl mb-4">{category.icon}</div>
-                  <span className="font-medium">{category.name}</span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CategoriesSection />
 
       {/* Popularne subskrypcje */}
       <section className="py-12 px-4 md:px-8 bg-gray-900">
