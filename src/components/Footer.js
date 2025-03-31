@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="bg-dark-400 py-8">
       <div className="container-custom">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4 text-light-100">SubCompare</h3>
             <p className="text-light-300 text-sm">
@@ -30,11 +30,6 @@ export default function Footer() {
               <li>
                 <Link href="/promotions" className="text-light-300 hover:text-primary transition-colors duration-200">
                   Promocje
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-light-300 hover:text-primary transition-colors duration-200">
-                  Blog
                 </Link>
               </li>
             </ul>
@@ -69,16 +64,6 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-light-100">Kontakt</h3>
-            <p className="text-light-300 text-sm mb-4">
-              Masz pytania lub sugestie? Skontaktuj się z nami!
-            </p>
-            <a href="mailto:kontakt@subcompare.pl" className="text-primary hover:text-primary-dark transition-colors duration-200 text-sm">
-              kontakt@subcompare.pl
-            </a>
           </div>
         </div>
         

@@ -35,12 +35,6 @@ export default function Navigation() {
             >
               Promocje
             </Link>
-            <Link 
-              href="/blog" 
-              className="text-light-100 hover:text-primary transition-colors duration-200"
-            >
-              Blog
-            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -85,13 +79,6 @@ export default function Navigation() {
               onClick={() => setIsMenuOpen(false)}
             >
               Promocje
-            </Link>
-            <Link 
-              href="/blog" 
-              className="block text-light-100 hover:text-primary py-2 transition-colors duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Blog
             </Link>
           </div>
         )}

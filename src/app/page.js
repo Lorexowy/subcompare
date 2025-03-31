@@ -439,62 +439,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Blog */}
-      <section className="py-12 px-4 md:px-8 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Z naszego bloga</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-            {latestBlogPosts.map(post => (
-              <div key={post.id} className="bg-gray-800 rounded-lg p-6 border border-gray-700 flex flex-col h-full">
-                {/* Obraz */}
-                <div className="bg-gray-700 h-48 rounded-lg mb-4 overflow-hidden">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-6xl opacity-20">{post.title.charAt(0)}</div>
-                  </div>
-                </div>
-                
-                {/* Kategoria i data */}
-                <div className="flex items-center justify-between mb-3 text-sm">
-                  <span className="text-blue-400 font-medium">{post.category}</span>
-                  <span className="text-gray-400">{formatDate(post.date)}</span>
-                </div>
-                
-                {/* Tytuł */}
-                <h3 className="font-bold text-lg mb-3">
-                  <a href={`/blog/${post.slug}`} className="hover:text-blue-400 transition-colors duration-200">
-                    {post.title}
-                  </a>
-                </h3>
-                
-                {/* Zajawka */}
-                <p className="text-gray-400 text-sm mb-4 flex-grow">
-                  {post.excerpt}
-                </p>
-                
-                {/* Autor i link */}
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-700">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2">
-                      <span className="font-medium text-sm">{post.author.charAt(0)}</span>
-                    </div>
-                    <span className="text-sm text-gray-400">{post.author}</span>
-                  </div>
-                  
-                  <a href={`/blog/${post.slug}`} className="text-blue-400 text-sm hover:text-blue-300 transition-colors duration-200">
-                    Czytaj więcej &rarr;
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-10">
-            <a href="/blog" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200">
-              Przejdź do bloga
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-16 bg-blue-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
