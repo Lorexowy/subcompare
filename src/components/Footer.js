@@ -68,7 +68,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-dark-100 mt-8 pt-6 text-center text-light-400 text-sm">
-          <p>© {currentYear} SubCompare. Wszystkie prawa zastrzeżone.</p>
+          <p>© {currentYear} SubCompare. Wszystkie prawa zastrzeżone. Created and coded by <a href='https://micheldev.pl/' target='_blank'>www.micheldev.pl</a></p>
         </div>
       </div>
     </footer>
