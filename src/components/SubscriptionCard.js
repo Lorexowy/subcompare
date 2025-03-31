@@ -11,7 +11,8 @@ import {
   ChevronRight,
   CheckCircle,
   User,
-  Award
+  Award,
+  ExternalLink
 } from 'lucide-react';
 
 export default function SubscriptionCard({ subscription, featured = false }) {
@@ -79,10 +80,13 @@ export default function SubscriptionCard({ subscription, featured = false }) {
         
         <div className="flex-grow">
           <h3 className="font-bold text-lg text-white">{subscription.name}</h3>
-          <p className="text-light-400 text-sm flex items-center">
+          <Link 
+            href={`/platform/${subscription.id}`}
+            className="text-light-400 text-sm flex items-center hover:text-primary-400 transition-colors"
+          >
             <User className="w-3 h-3 mr-1" />
             {subscription.provider}
-          </p>
+          </Link>
         </div>
         
         {/* Rating */}
@@ -146,18 +150,28 @@ export default function SubscriptionCard({ subscription, featured = false }) {
         )}
       </div>
       
-      {/* CTA button */}
-      <Link
-        href={`/compare?id=${subscription.id}`}
-        className={`w-full block text-center py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center ${
-          isHovered 
-            ? 'bg-primary-500 text-white shadow-md shadow-primary-500/20' 
-            : 'bg-dark-100 text-light-200 hover:bg-primary-600/20 hover:text-white'
-        }`}
-      >
-        Zobacz szczegóły
-        <ChevronRight className={`w-5 h-5 ml-1 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
-      </Link>
+      {/* Action buttons */}
+      <div className="grid grid-cols-2 gap-3">
+        <Link
+          href={`/platform/${subscription.id}`}
+          className={`block text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center ${
+            isHovered 
+              ? 'bg-primary-500 text-white shadow-md shadow-primary-500/20' 
+              : 'bg-dark-100 text-light-200 hover:bg-primary-600/20 hover:text-white'
+          }`}
+        >
+          Szczegóły
+          <ChevronRight className={`w-5 h-5 ml-1 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
+        </Link>
+        
+        <Link
+          href={`/compare?id=${subscription.id}`}
+          className="block text-center py-2 px-4 rounded-lg font-semibold bg-dark-100 text-light-200 hover:bg-dark-300 hover:text-white transition-all duration-300 flex items-center justify-center"
+        >
+          Porównaj
+          <ExternalLink className="w-4 h-4 ml-1" />
+        </Link>
+      </div>
     </div>
   );
 }

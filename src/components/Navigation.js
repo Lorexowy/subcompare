@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   Compass, Calculator, Tag, Menu, X, Home, 
-  ChevronRight, ArrowRight, ChevronDown
+  ChevronRight, ArrowRight, ChevronDown, Tv
 } from 'lucide-react';
 
 export default function Navigation() {
@@ -60,6 +60,11 @@ export default function Navigation() {
 
   // Main navigation items
   const navItems = [
+    {
+      name: "Platformy",
+      href: "/platform",
+      icon: <Tv className="w-5 h-5" />
+    },
     {
       name: "Porównywarka",
       href: "/compare",
