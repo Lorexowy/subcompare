@@ -155,19 +155,19 @@ export default function PlatformsPage() {
           {/* Wyszukiwarka i filtry */}
           <div className="max-w-3xl mx-auto mb-8">
             <div className="flex flex-col md:flex-row gap-4">
-              {/* Wyszukiwarka */}
-              <div className="relative flex-grow">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="w-5 h-5 text-light-400" />
-                </div>
+              {/* Wyszukiwarka - POPRAWIONA CZĘŚĆ */}
+              <div className="relative flex items-center">
                 <input
-                  type="text"
-                  className="block w-full bg-dark-100 border border-dark-200 rounded-lg py-3 pl-10 pr-3 text-light-100 placeholder-light-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="Szukaj platformy..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                    type="text"
+                    className="w-full bg-dark-100 border-none rounded-lg py-3 pl-12 pr-4 text-light-100 placeholder-light-500/50 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                    placeholder="Szukaj platformy..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
-              </div>
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <Search className="w-5 h-5 text-light-400" />
+                </div>
+                </div>
               
               {/* Filtr kategorii */}
               <div className="flex flex-wrap gap-2">
