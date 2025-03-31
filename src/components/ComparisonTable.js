@@ -1,70 +1,124 @@
 'use client'
 
-import Link from 'next/link'
-import { useState } from 'react'
+import { useState } from 'react';
+import Link from 'next/link';
+import { 
+  CheckCircle, 
+  XCircle, 
+  ExternalLink, 
+  Calendar, 
+  MonitorSmartphone, 
+  Video, 
+  Download, 
+  Ban, 
+  ArrowRight,
+  BarChart4,
+  CircleDollarSign,
+  ChevronDown,
+  Clock,
+  Tag
+} from 'lucide-react';
 
-export default function ComparisonTable({ subscriptions, selectedPaymentType = 'monthly' }) {
-  const [paymentType, setPaymentType] = useState(selectedPaymentType)
+export default function ComparisonTable({ 
+  subscriptions, 
+  selectedPaymentType = 'monthly' 
+}) {
+  const [paymentType, setPaymentType] = useState(selectedPaymentType);
+  const [expandedFeatures, setExpandedFeatures] = useState({});
   
-  // Funkcja formatująca cenę
+  // Format price with 2 decimal places
   const formatPrice = (price) => {
-    return price.toFixed(2) + ' zł'
-  }
+    return price.toFixed(2).replace('.', ',') + ' zł';
+  };
   
-  // Funkcja określająca cenę w zależności od typu płatności
+  // Get price based on payment type
   const getPrice = (subscription) => {
-    if (paymentType === 'yearly') {
-      return subscription.priceYearly ? (subscription.priceYearly / 12).toFixed(2) + ' zł/mies.*' : 'N/D'
+    if (paymentType === 'yearly' && subscription.priceYearly) {
+      return (
+        <div>
+          <span className="font-semibold">{(subscription.priceYearly / 12).toFixed(2).replace('.', ',')} zł</span>
+          <span className="text-xs text-light-400">/mies.*</span>
+        </div>
+      );
     } else {
-      return formatPrice(subscription.priceMonthly)
+      return (
+        <div>
+          <span className="font-semibold">{formatPrice(subscription.priceMonthly)}</span>
+        </div>
+      );
     }
-  }
+  };
   
-  // Funkcja renderująca ikony Tak/Nie
+  // Render boolean values as icons
   const renderBoolean = (value) => {
     if (value === true) {
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-green-500 mx-auto">
-          <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-        </svg>
-      )
+        <div className="flex justify-center">
+          <CheckCircle className="w-6 h-6 text-secondary-500" />
+        </div>
+      );
     } else {
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-red-500 mx-auto">
-          <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
-        </svg>
-      )
+        <div className="flex justify-center">
+          <XCircle className="w-6 h-6 text-light-500/50" />
+        </div>
+      );
     }
-  }
+  };
   
-  // Sprawdź czy mamy jakieś subskrypcje do porównania
+  // Toggle expanded features
+  const toggleExpandFeatures = (id) => {
+    setExpandedFeatures(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+  
+  // Check if we have any subscriptions
   if (!subscriptions || subscriptions.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-xl text-light-300">Brak subskrypcji do porównania.</p>
-        <Link href="/compare" className="btn-primary mt-4 inline-block">
+      <div className="rounded-xl glass p-10 text-center">
+        <p className="text-xl text-light-300 mb-4">Brak subskrypcji do porównania.</p>
+        <Link href="/compare" className="btn-primary inline-block">
           Wybierz subskrypcje do porównania
         </Link>
       </div>
-    )
+    );
   }
 
+  // Define table columns
+  const columns = [
+    { id: 'subscription', label: 'Subskrypcja', icon: null },
+    { id: 'price', label: 'Cena', icon: <CircleDollarSign className="w-4 h-4" /> },
+    { id: 'screens', label: 'Liczba ekranów', icon: <MonitorSmartphone className="w-4 h-4" /> },
+    { id: 'resolution', label: 'Jakość', icon: <Video className="w-4 h-4" /> },
+    { id: 'offline', label: 'Offline', icon: <Download className="w-4 h-4" /> },
+    { id: 'adsFree', label: 'Bez reklam', icon: <Ban className="w-4 h-4" /> },
+    { id: 'trial', label: 'Okres próbny', icon: <Calendar className="w-4 h-4" /> },
+    { id: 'rating', label: 'Ocena', icon: <BarChart4 className="w-4 h-4" /> },
+    { id: 'actions', label: 'Akcje', icon: null },
+  ];
+
   return (
-    <div className="overflow-x-auto">
-      {/* Przełącznik typu płatności */}
+    <div className="space-y-4">
+      {/* Payment type toggle */}
       <div className="flex justify-end mb-4">
-        <div className="inline-flex bg-dark-200 rounded-lg p-1">
+        <div className="inline-flex glass rounded-lg p-1">
           <button
-            className={`px-4 py-2 text-sm rounded-md ${
-              paymentType === 'monthly' ? 'bg-primary text-white' : 'text-light-300'
+            className={`px-4 py-2 text-sm rounded-md transition-colors duration-200 ${
+              paymentType === 'monthly' 
+                ? 'bg-primary-500 text-white' 
+                : 'text-light-300 hover:text-white'
             }`}
             onClick={() => setPaymentType('monthly')}
           >
             Miesięcznie
           </button>
           <button
-            className={`px-4 py-2 text-sm rounded-md ${
-              paymentType === 'yearly' ? 'bg-primary text-white' : 'text-light-300'
+            className={`px-4 py-2 text-sm rounded-md transition-colors duration-200 ${
+              paymentType === 'yearly' 
+                ? 'bg-primary-500 text-white' 
+                : 'text-light-300 hover:text-white'
             }`}
             onClick={() => setPaymentType('yearly')}
           >
@@ -73,99 +127,182 @@ export default function ComparisonTable({ subscriptions, selectedPaymentType = '
         </div>
       </div>
       
-      {/* Tabela porównawcza */}
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-dark-100">
-            <th className="p-4 text-left border-b border-dark-200 min-w-[200px]">Subskrypcja</th>
-            <th className="p-4 text-center border-b border-dark-200">Cena</th>
-            <th className="p-4 text-center border-b border-dark-200">Liczba ekranów</th>
-            <th className="p-4 text-center border-b border-dark-200">Jakość</th>
-            <th className="p-4 text-center border-b border-dark-200">Offline</th>
-            <th className="p-4 text-center border-b border-dark-200">Bez reklam</th>
-            <th className="p-4 text-center border-b border-dark-200">Okres próbny</th>
-            <th className="p-4 text-center border-b border-dark-200">Akcje</th>
-          </tr>
-        </thead>
-        <tbody>
-          {subscriptions.map((subscription, index) => (
-            <tr 
-              key={subscription.id} 
-              className={index % 2 === 0 ? 'bg-dark-300' : 'bg-dark-200'}
-            >
-              {/* Nazwa subskrypcji */}
-              <td className="p-4 border-b border-dark-200">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-md bg-white flex items-center justify-center mr-3 p-1">
-                    {/* Placeholder dla logo */}
-                    <div className="bg-gray-200 w-full h-full flex items-center justify-center rounded">
-                      <span className="text-dark-300 font-bold text-xs">{subscription.provider[0]}</span>
+      {/* Table container with gradient border */}
+      <div className="rounded-xl p-0.5 bg-gradient-to-br from-primary-700/30 via-primary-500/20 to-dark-300">
+        <div className="overflow-x-auto rounded-xl glass">
+          <table className="w-full border-collapse">
+            {/* Table header */}
+            <thead>
+              <tr className="bg-dark-100/70">
+                {columns.map(column => (
+                  <th key={column.id} className="p-4 text-left border-b border-dark-200 font-medium">
+                    <div className="flex items-center space-x-2">
+                      {column.icon && <span>{column.icon}</span>}
+                      <span>{column.label}</span>
                     </div>
-                  </div>
-                  <div>
-                    <div className="font-medium">{subscription.name}</div>
-                    <div className="text-sm text-light-300">{subscription.provider}</div>
-                  </div>
-                </div>
-              </td>
-              
-              {/* Cena */}
-              <td className="p-4 text-center border-b border-dark-200">
-                {getPrice(subscription)}
-                {paymentType === 'yearly' && subscription.yearlyDiscount > 0 && (
-                  <div className="text-xs text-green-400 mt-1">
-                    {subscription.yearlyDiscount}% taniej
-                  </div>
-                )}
-              </td>
-              
-              {/* Liczba ekranów */}
-              <td className="p-4 text-center border-b border-dark-200">
-                {subscription.screens}
-              </td>
-              
-              {/* Jakość */}
-              <td className="p-4 text-center border-b border-dark-200">
-                {subscription.resolution}
-              </td>
-              
-              {/* Offline */}
-              <td className="p-4 text-center border-b border-dark-200">
-                {renderBoolean(subscription.offlineViewing)}
-              </td>
-              
-              {/* Bez reklam */}
-              <td className="p-4 text-center border-b border-dark-200">
-                {renderBoolean(subscription.adsFree)}
-              </td>
-              
-              {/* Okres próbny */}
-              <td className="p-4 text-center border-b border-dark-200">
-                {subscription.trialPeriod > 0 ? `${subscription.trialPeriod} dni` : 'Brak'}
-              </td>
-              
-              {/* Akcje */}
-              <td className="p-4 text-center border-b border-dark-200">
-                <Link
-                  href={subscription.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-primary text-white py-1 px-3 rounded text-sm inline-block hover:bg-primary-dark transition-colors"
-                >
-                  Odwiedź
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            
+            {/* Table body */}
+            <tbody>
+              {subscriptions.map((subscription, index) => (
+                <>
+                  <tr 
+                    key={subscription.id} 
+                    className={`
+                      ${index % 2 === 0 ? 'bg-dark-300/70' : 'bg-dark-200/70'}
+                      transition-colors duration-200 hover:bg-dark-100/30
+                    `}
+                  >
+                    {/* Subscription name */}
+                    <td className="p-4 border-b border-dark-200/50">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0 w-12 h-12 rounded-md bg-dark-100 p-1 flex items-center justify-center">
+                          <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/10 rounded flex items-center justify-center">
+                            <span className="text-light-100 font-bold text-sm">{subscription.provider[0]}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-medium text-white">{subscription.name}</div>
+                          <div className="text-sm text-light-400">{subscription.provider}</div>
+                        </div>
+                      </div>
+                    </td>
+                    
+                    {/* Price */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      {getPrice(subscription)}
+                      {paymentType === 'yearly' && subscription.yearlyDiscount > 0 && (
+                        <div className="text-xs text-secondary-400 mt-1 flex items-center justify-center">
+                          <Tag className="w-3 h-3 mr-1" />
+                          {subscription.yearlyDiscount}% taniej
+                        </div>
+                      )}
+                    </td>
+                    
+                    {/* Screens */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      <div className="py-1 px-3 bg-dark-100/50 rounded-full inline-block">
+                        <span className="font-medium">{subscription.screens}</span>
+                      </div>
+                    </td>
+                    
+                    {/* Resolution */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      <div className="py-1 px-3 bg-dark-100/50 rounded-full inline-block">
+                        <span className="font-medium">{subscription.resolution}</span>
+                      </div>
+                    </td>
+                    
+                    {/* Offline */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      {renderBoolean(subscription.offlineViewing)}
+                    </td>
+                    
+                    {/* Ads Free */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      {renderBoolean(subscription.adsFree)}
+                    </td>
+                    
+                    {/* Trial period */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      {subscription.trialPeriod > 0 ? (
+                        <div className="flex items-center justify-center">
+                          <Clock className="w-4 h-4 text-secondary-500 mr-1" />
+                          <span className="font-medium">{subscription.trialPeriod} dni</span>
+                        </div>
+                      ) : (
+                        <span className="text-light-500">Brak</span>
+                      )}
+                    </td>
+                    
+                    {/* Rating */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      <div className="flex items-center justify-center">
+                        <div className="bg-dark-100/50 py-1 px-3 rounded-full flex items-center">
+                          <span className="text-amber-400 font-semibold">{subscription.rating.toFixed(1)}</span>
+                          <span className="text-light-500 text-xs ml-1">/5</span>
+                        </div>
+                      </div>
+                    </td>
+                    
+                    {/* Actions */}
+                    <td className="p-4 text-center border-b border-dark-200/50">
+                      <div className="flex space-x-2 justify-center">
+                        <Link
+                          href={subscription.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-primary-500 text-white py-2 px-3 rounded-lg text-sm inline-flex items-center hover:bg-primary-600 transition-colors"
+                        >
+                          Odwiedź
+                          <ExternalLink className="w-3 h-3 ml-1" />
+                        </Link>
+                        
+                        <button
+                          onClick={() => toggleExpandFeatures(subscription.id)}
+                          className="bg-dark-100 text-light-300 py-2 px-3 rounded-lg text-sm inline-flex items-center hover:bg-dark-300 hover:text-white transition-colors"
+                        >
+                          Szczegóły
+                          <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-200 ${
+                            expandedFeatures[subscription.id] ? 'rotate-180' : ''
+                          }`} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  {/* Expanded features row */}
+                  {expandedFeatures[subscription.id] && (
+                    <tr className="bg-dark-100/30">
+                      <td colSpan={columns.length} className="p-4 border-b border-dark-200/50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-down">
+                          {subscription.features && subscription.features.map((feature, idx) => (
+                            <div key={idx} className="glass p-3 rounded-lg">
+                              <div className="text-sm text-light-400">{feature.name}:</div>
+                              <div className="font-medium text-white">{feature.value}</div>
+                            </div>
+                          ))}
+                          
+                          {subscription.tags && (
+                            <div className="glass p-3 rounded-lg">
+                              <div className="text-sm text-light-400 mb-2">Tagi:</div>
+                              <div className="flex flex-wrap gap-2">
+                                {subscription.tags.map((tag, idx) => (
+                                  <span key={idx} className="badge-primary text-xs">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="glass p-3 rounded-lg">
+                            <div className="text-sm text-light-400 mb-1">Opis:</div>
+                            <div className="text-light-300 text-sm">
+                              {subscription.description || 'Brak opisu'}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
       
-      {/* Informacja o cenie rocznej */}
+      {/* Payment info */}
       {paymentType === 'yearly' && (
-        <div className="mt-3 text-sm text-light-300">
+        <div className="mt-2 text-sm text-light-400 flex items-center">
+          <Calendar className="w-4 h-4 mr-2" />
           * Cena miesięczna przy płatności rocznej z góry
         </div>
       )}
     </div>
-  )
+  );
 }

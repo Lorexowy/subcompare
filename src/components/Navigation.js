@@ -1,92 +1,98 @@
 'use client'
 
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { 
+  Compass, Calculator, Tag, Menu, X, Home, 
+  ChevronRight, ArrowRight, ChevronDown
+} from 'lucide-react';
 
 export default function Navigation() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const pathname = usePathname()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeMobileDropdown, setActiveMobileDropdown] = useState(null);
+  const pathname = usePathname();
 
-  // Efekt wykrywający scroll
+  // Effect to detect scrolling
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
-        setIsScrolled(true)
+        setIsScrolled(true);
       } else {
-        setIsScrolled(false)
+        setIsScrolled(false);
       }
-    }
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Funkcja sprawdzająca, czy link jest aktywny
-  const isActive = (path) => {
-    return pathname === path
-  }
-
-  // Zamknij menu po kliknięciu poza navem
+  // Close menu on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isMenuOpen && !event.target.closest('nav')) {
-        setIsMenuOpen(false)
+        setIsMenuOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [isMenuOpen])
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isMenuOpen]);
 
-  // Definiujemy obiekty nawigacyjne z ikonami
+  // Navigate to a page and close menu
+  const navigateTo = () => {
+    setIsMenuOpen(false);
+    setActiveMobileDropdown(null);
+  };
+
+  // Check if a path is active
+  const isActive = (path) => pathname === path;
+
+  // Categories dropdown items
+  const categories = [
+    { name: "Streaming wideo", path: "/compare?category=streaming" },
+    { name: "Streaming muzyczny", path: "/compare?category=music" },
+    { name: "Gry", path: "/compare?category=gaming" },
+    { name: "Audiobooki", path: "/compare?category=audiobooks" },
+    { name: "Sport", path: "/compare?category=sport" }
+  ];
+
+  // Main navigation items
   const navItems = [
     {
       name: "Porównywarka",
       href: "/compare",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      )
+      icon: <Compass className="w-5 h-5" />
     },
     {
       name: "Kalkulator pakietów",
       href: "/calculator",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-        </svg>
-      )
+      icon: <Calculator className="w-5 h-5" />
     },
     {
       name: "Promocje",
       href: "/promotions",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: <Tag className="w-5 h-5" />
     }
-  ]
+  ];
 
   return (
     <nav 
       className={`${
         isScrolled 
-          ? 'bg-dark-400/95 backdrop-blur-sm shadow-lg' 
-          : 'bg-dark-400'
-      } transition-all duration-300 sticky top-0 z-50`}
+          ? 'bg-dark-300/80 backdrop-blur-md shadow-lg' 
+          : 'bg-dark-300'
+      } transition-all duration-300 fixed top-0 left-0 right-0 z-50`}
     >
       <div className="container-custom">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+          <Link href="/" className="flex items-center space-x-2 group" onClick={navigateTo}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center transition-all duration-300 group-hover:shadow-glow transform group-hover:scale-105">
               <span className="text-white font-bold text-lg">S</span>
             </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-500">
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-300 to-primary-500">
               SubCompare
             </span>
           </Link>
@@ -105,26 +111,44 @@ export default function Navigation() {
                 </span>
               </NavLink>
             ))}
+            
+            {/* Categories Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center px-3 py-2 rounded-lg text-light-300 hover:text-white group-hover:bg-dark-100 transition-colors duration-200">
+                <span className="mr-1">Kategorie</span>
+                <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+              </button>
+              <div className="absolute right-0 mt-1 w-56 origin-top-right hidden group-hover:block animate-fade-in">
+                <div className="glass rounded-xl py-2 shadow-xl shadow-black/10 border border-primary-900/20">
+                  {categories.map((category, index) => (
+                    <Link 
+                      key={index}
+                      href={category.path}
+                      className="flex items-center px-4 py-2 text-sm text-light-300 hover:text-white hover:bg-primary-500/10 transition-colors duration-150"
+                    >
+                      <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100" />
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button 
               onClick={(e) => {
-                e.stopPropagation()
-                setIsMenuOpen(!isMenuOpen)
+                e.stopPropagation();
+                setIsMenuOpen(!isMenuOpen);
               }}
-              className="text-white hover:text-primary focus:outline-none p-2 rounded-lg hover:bg-dark-300 transition-colors duration-200"
+              className="text-white hover:text-primary-400 focus:outline-none p-2 rounded-lg hover:bg-dark-100 transition-colors duration-200"
               aria-label={isMenuOpen ? "Zamknij menu" : "Otwórz menu"}
             >
               {isMenuOpen ? (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-6 h-6" />
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <Menu className="w-6 h-6" />
               )}
             </button>
           </div>
@@ -132,59 +156,87 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-1 animate-fadeIn">
+          <div className="md:hidden py-4 space-y-2 animate-slide-down">
+            <Link 
+              href="/"
+              onClick={navigateTo}
+              className={`flex items-center py-3 px-4 rounded-lg transition-colors duration-200 ${
+                isActive('/') 
+                  ? 'bg-primary-500/10 text-white font-medium' 
+                  : 'text-light-300 hover:text-white hover:bg-dark-100'
+              }`}
+            >
+              <Home className="w-5 h-5 mr-3" />
+              <span>Strona główna</span>
+            </Link>
+            
             {navItems.map((item) => (
-              <MobileNavLink 
+              <Link 
                 key={item.href}
-                href={item.href} 
-                isActive={isActive(item.href)}
-                onClick={() => setIsMenuOpen(false)}
+                href={item.href}
+                onClick={navigateTo}
+                className={`flex items-center py-3 px-4 rounded-lg transition-colors duration-200 ${
+                  isActive(item.href) 
+                    ? 'bg-primary-500/10 text-white font-medium' 
+                    : 'text-light-300 hover:text-white hover:bg-dark-100'
+                }`}
+              >
+                <span className="mr-3">{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            ))}
+            
+            {/* Mobile Categories Dropdown */}
+            <div>
+              <button 
+                onClick={() => setActiveMobileDropdown(activeMobileDropdown === 'categories' ? null : 'categories')}
+                className="w-full flex items-center justify-between py-3 px-4 rounded-lg text-light-300 hover:text-white hover:bg-dark-100 transition-colors duration-200"
               >
                 <span className="flex items-center">
-                  <span className="mr-3">{item.icon}</span>
-                  {item.name}
+                  <Compass className="w-5 h-5 mr-3" />
+                  <span>Kategorie</span>
                 </span>
-              </MobileNavLink>
-            ))}
+                <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${activeMobileDropdown === 'categories' ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {activeMobileDropdown === 'categories' && (
+                <div className="mt-1 pl-12 pr-4 pb-2 space-y-1 animate-slide-down">
+                  {categories.map((category, index) => (
+                    <Link 
+                      key={index}
+                      href={category.path}
+                      onClick={navigateTo}
+                      className="flex items-center py-2 px-4 rounded-lg text-sm text-light-300 hover:text-white hover:bg-dark-100 transition-colors duration-200"
+                    >
+                      <ChevronRight className="w-4 h-4 mr-2" />
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
     </nav>
-  )
+  );
 }
 
-// Komponent dla linków nawigacji na desktop
+// Component for desktop navigation links
 function NavLink({ href, isActive, children }) {
   return (
     <Link 
       href={href} 
-      className={`px-3 py-2 rounded-lg transition-colors duration-200 relative group ${
+      className={`px-3 py-2 rounded-lg transition-all duration-200 relative group ${
         isActive 
           ? 'text-white font-medium' 
-          : 'text-light-300 hover:text-white hover:bg-dark-300'
+          : 'text-light-300 hover:text-white hover:bg-dark-100'
       }`}
     >
       {children}
       {isActive && (
-        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-green-500 rounded-full"></span>
+        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"></span>
       )}
     </Link>
-  )
-}
-
-// Komponent dla linków nawigacji na mobile
-function MobileNavLink({ href, isActive, onClick, children }) {
-  return (
-    <Link 
-      href={href} 
-      onClick={onClick}
-      className={`block py-3 px-4 rounded-lg transition-colors duration-200 ${
-        isActive 
-          ? 'bg-gradient-to-r from-blue-500/10 to-green-500/10 text-white font-medium border-l-4 border-blue-500' 
-          : 'text-light-300 hover:text-white hover:bg-dark-300'
-      }`}
-    >
-      {children}
-    </Link>
-  )
+  );
 }
