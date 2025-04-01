@@ -12,7 +12,12 @@ import {
   CheckCircle,
   User,
   Award,
-  ExternalLink
+  ExternalLink,
+  Music,
+  Headphones,
+  Gamepad2,
+  Trophy,
+  Tv
 } from 'lucide-react';
 
 export default function SubscriptionCard({ subscription, featured = false }) {
@@ -48,6 +53,118 @@ export default function SubscriptionCard({ subscription, featured = false }) {
     setIsHovered(false);
   };
 
+  // Get category icon
+  const getCategoryIcon = () => {
+    switch(subscription.category) {
+      case 'streaming':
+        return <Tv className="w-6 h-6 text-blue-400" />;
+      case 'music':
+        return <Music className="w-6 h-6 text-pink-400" />;
+      case 'gaming':
+        return <Gamepad2 className="w-6 h-6 text-green-400" />;
+      case 'audiobooks':
+        return <Headphones className="w-6 h-6 text-amber-400" />;
+      case 'sport':
+        return <Trophy className="w-6 h-6 text-red-400" />;
+      default:
+        return <Tv className="w-6 h-6 text-blue-400" />;
+    }
+  };
+
+  // Get feature items based on category
+  const getFeatureItems = () => {
+    const items = [];
+    
+    // Common feature for all: price is displayed separately
+    
+    // Category-specific features
+    switch(subscription.category) {
+      case 'streaming':
+      case 'sport':
+        items.push(
+          <div key="screens" className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
+            <Monitor className="w-4 h-4 text-primary-400 mr-3" />
+            <span className="text-light-300">
+              {subscription.screens} {subscription.screens === 1 ? 'ekran' : subscription.screens < 5 ? 'ekrany' : 'ekranów'}
+            </span>
+          </div>,
+          <div key="quality" className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
+            <Server className="w-4 h-4 text-primary-400 mr-3" />
+            <span className="text-light-300">Jakość: {subscription.resolution}</span>
+          </div>
+        );
+        break;
+      
+      case 'music':
+        items.push(
+          <div key="quality" className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
+            <Music className="w-4 h-4 text-primary-400 mr-3" />
+            <span className="text-light-300">
+              {subscription.features?.find(f => f.name === 'Jakość dźwięku')?.value || 'Standard'}
+            </span>
+          </div>
+        );
+        break;
+        
+      case 'audiobooks':
+        items.push(
+          <div key="titles" className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
+            <Headphones className="w-4 h-4 text-primary-400 mr-3" />
+            <span className="text-light-300">
+              {subscription.features?.find(f => f.name === 'Dostępne tytuły')?.value || 'Wiele tytułów'}
+            </span>
+          </div>
+        );
+        break;
+        
+      case 'gaming':
+        items.push(
+          <div key="games" className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
+            <Gamepad2 className="w-4 h-4 text-primary-400 mr-3" />
+            <span className="text-light-300">
+              {subscription.features?.find(f => f.name === 'Liczba gier')?.value || 'Bogata biblioteka'}
+            </span>
+          </div>
+        );
+        break;
+    }
+    
+    // Common feature: offline viewing/download for all categories
+    items.push(
+      <div key="offline" className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
+        <Download className="w-4 h-4 text-primary-400 mr-3" />
+        <span className="text-light-300">
+          {subscription.offlineViewing ? (
+            <span className="flex items-center text-light-300">
+              <CheckCircle className="w-4 h-4 text-secondary-400 mr-1" />
+              {subscription.category === 'audiobooks' || subscription.category === 'music' 
+                ? 'Tryb offline' 
+                : subscription.category === 'gaming' 
+                  ? 'Gry offline' 
+                  : 'Pobieranie offline'}
+            </span>
+          ) : (
+            'Tylko online'
+          )}
+        </span>
+      </div>
+    );
+    
+    // Trial period if available
+    if (subscription.trialPeriod > 0) {
+      items.push(
+        <div key="trial" className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
+          <Clock className="w-4 h-4 text-primary-400 mr-3" />
+          <span className="text-light-300">
+            <span className="text-secondary-400 font-medium">{subscription.trialPeriod} dni</span> okresu próbnego
+          </span>
+        </div>
+      );
+    }
+    
+    return items;
+  };
+
   return (
     <div 
       ref={cardRef}
@@ -72,10 +189,8 @@ export default function SubscriptionCard({ subscription, featured = false }) {
         <div className={`flex-shrink-0 w-16 h-16 rounded-lg transition-all duration-300 ${
           isHovered ? 'bg-primary-500/20' : 'bg-dark-100'
         } flex items-center justify-center p-3`}>
-          {/* Logo placeholder */}
-          <div className="bg-gradient-to-br from-white/5 to-white/10 w-full h-full rounded-md flex items-center justify-center">
-            <span className="text-lg font-bold text-white">{subscription.provider[0]}</span>
-          </div>
+          {/* Category icon */}
+          {getCategoryIcon()}
         </div>
         
         <div className="flex-grow">
@@ -112,42 +227,9 @@ export default function SubscriptionCard({ subscription, featured = false }) {
         )}
       </div>
       
-      {/* Feature list */}
+      {/* Feature list - dynamic based on category */}
       <div className="space-y-3 mb-6">
-        <div className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
-          <Monitor className="w-4 h-4 text-primary-400 mr-3" />
-          <span className="text-light-300">
-            {subscription.screens} {subscription.screens === 1 ? 'ekran' : subscription.screens < 5 ? 'ekrany' : 'ekranów'}
-          </span>
-        </div>
-        
-        <div className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
-          <Server className="w-4 h-4 text-primary-400 mr-3" />
-          <span className="text-light-300">Jakość: {subscription.resolution}</span>
-        </div>
-        
-        <div className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
-          <Download className="w-4 h-4 text-primary-400 mr-3" />
-          <span className="text-light-300">
-            {subscription.offlineViewing ? (
-              <span className="flex items-center text-light-300">
-                <CheckCircle className="w-4 h-4 text-secondary-400 mr-1" />
-                Pobieranie offline
-              </span>
-            ) : (
-              'Brak pobierania offline'
-            )}
-          </span>
-        </div>
-        
-        {subscription.trialPeriod > 0 && (
-          <div className="flex items-center text-sm bg-dark-100 p-3 rounded-lg">
-            <Clock className="w-4 h-4 text-primary-400 mr-3" />
-            <span className="text-light-300">
-              <span className="text-secondary-400 font-medium">{subscription.trialPeriod} dni</span> okresu próbnego
-            </span>
-          </div>
-        )}
+        {getFeatureItems()}
       </div>
       
       {/* Action buttons */}

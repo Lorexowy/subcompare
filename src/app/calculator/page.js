@@ -83,6 +83,71 @@ export default function CalculatorPage() {
     return Array.from(subscriptionCategories)
   }
   
+  // Funkcja generująca pakiet subskrypcji
+  const generatePackage = (availableSubs, maxBudget, categories) => {
+    // Priorytetyzuj subskrypcje, które pokrywają wiele kategorii
+    const scoredSubs = availableSubs.map(sub => {
+      let score = sub.rating
+      
+      // Dodaj punkty za każdą kategorię zainteresowań, którą pokrywa subskrypcja
+      if (categories.includes('movies') && sub.tags.some(tag => ['filmy'].includes(tag))) score += 1
+      if (categories.includes('series') && sub.tags.some(tag => ['seriale'].includes(tag))) score += 1
+      if (categories.includes('music') && sub.tags.some(tag => ['muzyka', 'podcasty'].includes(tag))) score += 1
+      if (categories.includes('sports') && sub.tags.some(tag => ['sport', 'piłka nożna', 'transmisje sportowe'].includes(tag))) score += 1
+      if (categories.includes('gaming') && sub.tags.some(tag => ['gry'].includes(tag))) score += 1
+      if (categories.includes('books') && sub.tags.some(tag => ['audiobooki', 'e-booki'].includes(tag))) score += 1
+      if (categories.includes('kids') && sub.tags.some(tag => ['bajki', 'dzieci'].includes(tag))) score += 1
+      if (categories.includes('documentaries') && sub.tags.some(tag => ['dokumenty'].includes(tag))) score += 1
+      
+      // Dodaj bonus za jakość
+      if (sub.resolution === '4K' || sub.resolution === 'Full HD') score += 0.5
+      
+      // Dodaj bonus za możliwość oglądania offline
+      if (sub.offlineViewing) score += 0.3
+      
+      // Dodaj bonus za brak reklam
+      if (sub.adsFree) score += 0.3
+      
+      // Sprawdź, czy subskrypcja oferuje okres próbny
+      if (sub.trialPeriod > 0) score += 0.2
+      
+      // Sprawdź, czy subskrypcja oferuje zniżkę roczną
+      if (sub.yearlyDiscount > 0) score += 0.2
+      
+      return { ...sub, score }
+    }).sort((a, b) => b.score - a.score)
+    
+    // Wybierz najlepsze subskrypcje w ramach budżetu
+    const packageList = []
+    let remainingBudget = maxBudget
+    let coveredCategories = new Set()
+    
+    // Najpierw wybierz subskrypcje z najwyższym wynikiem
+    for (const sub of scoredSubs) {
+      // Sprawdź, czy nie dodajemy duplikatu kategorii, chyba że to jest uzasadnione
+      const isDuplicate = packageList.some(s => s.category === sub.category)
+      const isWorthDuplicate = sub.score > 4.5 // Tylko jeśli ma bardzo wysoki wynik
+      
+      if (sub.priceMonthly <= remainingBudget && (!isDuplicate || isWorthDuplicate)) {
+        packageList.push(sub)
+        remainingBudget -= sub.priceMonthly
+        sub.tags.forEach(tag => coveredCategories.add(tag))
+      }
+      
+      // Zakończ, gdy wszystkie kategorie są pokryte lub skończyły się subskrypcje
+      if (packageList.length >= 4) break
+    }
+    
+    // Oblicz całkowity koszt pakietu
+    const totalCost = packageList.reduce((sum, sub) => sum + sub.priceMonthly, 0)
+    
+    return {
+      subscriptions: packageList,
+      totalCost: totalCost,
+      savings: maxBudget - totalCost
+    }
+  }
+  
   // Funkcja obliczająca rekomendowane pakiety
   const calculateRecommendations = (categories = selectedCategories, budgetValue = budget) => {
     if (categories.length === 0) {
@@ -118,52 +183,6 @@ export default function CalculatorPage() {
     })
     
     setShowResults(true)
-  }
-  
-  // Funkcja generująca pakiet subskrypcji
-  const generatePackage = (availableSubs, maxBudget, categories) => {
-    // Priorytetyzuj subskrypcje, które pokrywają wiele kategorii
-    const scoredSubs = availableSubs.map(sub => {
-      let score = sub.rating
-      
-      // Dodaj punkty za każdą kategorię zainteresowań, którą pokrywa subskrypcja
-      if (categories.includes('movies') && sub.tags.some(tag => ['filmy'].includes(tag))) score += 1
-      if (categories.includes('series') && sub.tags.some(tag => ['seriale'].includes(tag))) score += 1
-      if (categories.includes('music') && sub.tags.some(tag => ['muzyka', 'podcasty'].includes(tag))) score += 1
-      if (categories.includes('sports') && sub.tags.some(tag => ['sport', 'piłka nożna'].includes(tag))) score += 1
-      if (categories.includes('gaming') && sub.tags.some(tag => ['gry'].includes(tag))) score += 1
-      if (categories.includes('books') && sub.tags.some(tag => ['audiobooki', 'e-booki'].includes(tag))) score += 1
-      if (categories.includes('kids') && sub.tags.some(tag => ['bajki', 'dzieci'].includes(tag))) score += 1
-      if (categories.includes('documentaries') && sub.tags.some(tag => ['dokumenty'].includes(tag))) score += 1
-      
-      return { ...sub, score }
-    }).sort((a, b) => b.score - a.score)
-    
-    // Wybierz najlepsze subskrypcje w ramach budżetu
-    const packageList = []
-    let remainingBudget = maxBudget
-    let coveredCategories = new Set()
-    
-    // Najpierw wybierz subskrypcje z najwyższym wynikiem
-    for (const sub of scoredSubs) {
-      if (sub.priceMonthly <= remainingBudget && !packageList.some(s => s.category === sub.category)) {
-        packageList.push(sub)
-        remainingBudget -= sub.priceMonthly
-        sub.tags.forEach(tag => coveredCategories.add(tag))
-      }
-      
-      // Zakończ, gdy wszystkie kategorie są pokryte lub skończyły się subskrypcje
-      if (packageList.length >= 4) break
-    }
-    
-    // Oblicz całkowity koszt pakietu
-    const totalCost = packageList.reduce((sum, sub) => sum + sub.priceMonthly, 0)
-    
-    return {
-      subscriptions: packageList,
-      totalCost: totalCost,
-      savings: maxBudget - totalCost
-    }
   }
   
   return (
@@ -401,7 +420,7 @@ export default function CalculatorPage() {
                     </div>
                     
                     <p className="text-sm text-light-300 mb-4">
-                      {sub.description.length > 100 
+                      {sub.description && sub.description.length > 100 
                         ? sub.description.substring(0, 100) + '...' 
                         : sub.description}
                     </p>

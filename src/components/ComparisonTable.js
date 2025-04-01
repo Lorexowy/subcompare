@@ -16,7 +16,11 @@ import {
   CircleDollarSign,
   ChevronDown,
   Clock,
-  Tag
+  Tag,
+  Music,
+  Headphones,
+  Gamepad2,
+  Trophy
 } from 'lucide-react';
 
 export default function ComparisonTable({ 
@@ -66,6 +70,24 @@ export default function ComparisonTable({
     }
   };
   
+  // Get category icon
+  const getCategoryIcon = (category) => {
+    switch(category) {
+      case 'streaming':
+        return <Video className="w-5 h-5 text-blue-400" />;
+      case 'music':
+        return <Music className="w-5 h-5 text-pink-400" />;
+      case 'gaming':
+        return <Gamepad2 className="w-5 h-5 text-green-400" />;
+      case 'audiobooks':
+        return <Headphones className="w-5 h-5 text-amber-400" />;
+      case 'sport':
+        return <Trophy className="w-5 h-5 text-red-400" />;
+      default:
+        return <Video className="w-5 h-5 text-blue-400" />;
+    }
+  };
+  
   // Toggle expanded features
   const toggleExpandFeatures = (id) => {
     setExpandedFeatures(prev => ({
@@ -86,18 +108,55 @@ export default function ComparisonTable({
     );
   }
 
-  // Define table columns
-  const columns = [
-    { id: 'subscription', label: 'Subskrypcja', icon: null },
-    { id: 'price', label: 'Cena', icon: <CircleDollarSign className="w-4 h-4" /> },
-    { id: 'screens', label: 'Liczba ekranów', icon: <MonitorSmartphone className="w-4 h-4" /> },
-    { id: 'resolution', label: 'Jakość', icon: <Video className="w-4 h-4" /> },
-    { id: 'offline', label: 'Offline', icon: <Download className="w-4 h-4" /> },
-    { id: 'adsFree', label: 'Bez reklam', icon: <Ban className="w-4 h-4" /> },
-    { id: 'trial', label: 'Okres próbny', icon: <Calendar className="w-4 h-4" /> },
-    { id: 'rating', label: 'Ocena', icon: <BarChart4 className="w-4 h-4" /> },
-    { id: 'actions', label: 'Akcje', icon: null },
-  ];
+  // Define table columns based on subscription category
+  const getColumnsForCategory = (subscriptions) => {
+    // Get all unique categories
+    const categories = [...new Set(subscriptions.map(sub => sub.category))];
+    
+    // Base columns for all subscription types
+    const baseColumns = [
+      { id: 'subscription', label: 'Subskrypcja', icon: null },
+      { id: 'price', label: 'Cena', icon: <CircleDollarSign className="w-4 h-4" /> },
+      { id: 'rating', label: 'Ocena', icon: <BarChart4 className="w-4 h-4" /> },
+      { id: 'trial', label: 'Okres próbny', icon: <Calendar className="w-4 h-4" /> },
+      { id: 'actions', label: 'Akcje', icon: null },
+    ];
+    
+    // Add category specific columns
+    if (categories.includes('streaming') || categories.includes('sport')) {
+      baseColumns.splice(2, 0, 
+        { id: 'screens', label: 'Liczba ekranów', icon: <MonitorSmartphone className="w-4 h-4" /> },
+        { id: 'resolution', label: 'Jakość', icon: <Video className="w-4 h-4" /> },
+        { id: 'offline', label: 'Offline', icon: <Download className="w-4 h-4" /> },
+        { id: 'adsFree', label: 'Bez reklam', icon: <Ban className="w-4 h-4" /> }
+      );
+    } else if (categories.includes('music') || categories.includes('audiobooks')) {
+      baseColumns.splice(2, 0, 
+        { id: 'offline', label: 'Offline', icon: <Download className="w-4 h-4" /> },
+        { id: 'adsFree', label: 'Bez reklam', icon: <Ban className="w-4 h-4" /> }
+      );
+    } else if (categories.includes('gaming')) {
+      baseColumns.splice(2, 0, 
+        { id: 'offline', label: 'Offline', icon: <Download className="w-4 h-4" /> },
+        { id: 'platforms', label: 'Platformy', icon: <Gamepad2 className="w-4 h-4" /> }
+      );
+    }
+    
+    return baseColumns;
+  };
+  
+  // Get columns based on current subscriptions
+  const columns = getColumnsForCategory(subscriptions);
+
+  // Get a value for a dynamic column
+  const getDynamicColumnValue = (subscription, columnId) => {
+    switch(columnId) {
+      case 'platforms':
+        return subscription.features?.find(f => f.name === 'Platformy')?.value || 'N/A';
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -160,8 +219,8 @@ export default function ComparisonTable({
                     <td className="p-4 border-b border-dark-200/50">
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0 w-12 h-12 rounded-md bg-dark-100 p-1 flex items-center justify-center">
-                          <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/10 rounded flex items-center justify-center">
-                            <span className="text-light-100 font-bold text-sm">{subscription.provider[0]}</span>
+                          <div className="w-full h-full flex items-center justify-center">
+                            {getCategoryIcon(subscription.category)}
                           </div>
                         </div>
                         <div>
@@ -182,28 +241,47 @@ export default function ComparisonTable({
                       )}
                     </td>
                     
-                    {/* Screens */}
+                    {/* Dynamic columns based on category */}
+                    {columns.map(column => {
+                      if (column.id === 'subscription' || column.id === 'price' || column.id === 'rating' || column.id === 'trial' || column.id === 'actions') {
+                        return null; // These are handled separately
+                      }
+                      
+                      return (
+                        <td key={column.id} className="p-4 text-center border-b border-dark-200/50">
+                          {column.id === 'screens' && (
+                            <div className="py-1 px-3 bg-dark-100/50 rounded-full inline-block">
+                              <span className="font-medium">{subscription.screens}</span>
+                            </div>
+                          )}
+                          
+                          {column.id === 'resolution' && (
+                            <div className="py-1 px-3 bg-dark-100/50 rounded-full inline-block">
+                              <span className="font-medium">{subscription.resolution}</span>
+                            </div>
+                          )}
+                          
+                          {column.id === 'offline' && renderBoolean(subscription.offlineViewing)}
+                          
+                          {column.id === 'adsFree' && renderBoolean(subscription.adsFree)}
+                          
+                          {column.id === 'platforms' && (
+                            <div className="py-1 px-3 bg-dark-100/50 rounded-full inline-block">
+                              <span className="font-medium">{getDynamicColumnValue(subscription, 'platforms')}</span>
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                    
+                    {/* Rating */}
                     <td className="p-4 text-center border-b border-dark-200/50">
-                      <div className="py-1 px-3 bg-dark-100/50 rounded-full inline-block">
-                        <span className="font-medium">{subscription.screens}</span>
+                      <div className="flex items-center justify-center">
+                        <div className="bg-dark-100/50 py-1 px-3 rounded-full flex items-center">
+                          <span className="text-amber-400 font-semibold">{subscription.rating.toFixed(1)}</span>
+                          <span className="text-light-500 text-xs ml-1">/5</span>
+                        </div>
                       </div>
-                    </td>
-                    
-                    {/* Resolution */}
-                    <td className="p-4 text-center border-b border-dark-200/50">
-                      <div className="py-1 px-3 bg-dark-100/50 rounded-full inline-block">
-                        <span className="font-medium">{subscription.resolution}</span>
-                      </div>
-                    </td>
-                    
-                    {/* Offline */}
-                    <td className="p-4 text-center border-b border-dark-200/50">
-                      {renderBoolean(subscription.offlineViewing)}
-                    </td>
-                    
-                    {/* Ads Free */}
-                    <td className="p-4 text-center border-b border-dark-200/50">
-                      {renderBoolean(subscription.adsFree)}
                     </td>
                     
                     {/* Trial period */}
@@ -216,16 +294,6 @@ export default function ComparisonTable({
                       ) : (
                         <span className="text-light-500">Brak</span>
                       )}
-                    </td>
-                    
-                    {/* Rating */}
-                    <td className="p-4 text-center border-b border-dark-200/50">
-                      <div className="flex items-center justify-center">
-                        <div className="bg-dark-100/50 py-1 px-3 rounded-full flex items-center">
-                          <span className="text-amber-400 font-semibold">{subscription.rating.toFixed(1)}</span>
-                          <span className="text-light-500 text-xs ml-1">/5</span>
-                        </div>
-                      </div>
                     </td>
                     
                     {/* Actions */}
