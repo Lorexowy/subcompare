@@ -5,7 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import subscriptions from '../../data/subscriptions'
 
-export default function CalculatorPage() {
+// Wydzielony komponent wewnętrzny (bez export)
+function CalculatorContent() {
   const searchParams = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState([])
   const [budget, setBudget] = useState(50)
@@ -479,6 +480,7 @@ export default function CalculatorPage() {
   )
 }
 
+// UWAGA: Tylko jeden export default!
 export default function CalculatorPage() {
   return (
     <Suspense fallback={
