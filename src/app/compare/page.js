@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import subscriptions from '../../data/subscriptions'
 import ComparisonTable from '../../components/ComparisonTable'
 
-export default function ComparePage() {
+// Komponent wewnętrzny zawierający główną funkcjonalność
+function CompareContent() {
   const searchParams = useSearchParams()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedSubscriptions, setSelectedSubscriptions] = useState([])
@@ -308,4 +309,20 @@ export default function ComparePage() {
       </div>
     </div>
   )
+}
+
+// Główny komponent strony z Suspense
+export default function ComparePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-dark-300">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-light-200 text-xl">Ładowanie...</p>
+        </div>
+      </div>
+    }>
+      <CompareContent />
+    </Suspense>
+  );
 }
