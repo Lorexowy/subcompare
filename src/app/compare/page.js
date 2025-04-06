@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import subscriptions from '../../data/subscriptions'
 import ComparisonTable from '../../components/ComparisonTable'
+import { ChevronUp, Check } from 'lucide-react'
 
 // Komponent wewnętrzny zawierający główną funkcjonalność
 function CompareContent() {
@@ -15,6 +16,7 @@ function CompareContent() {
   const [searchTerm, setSearchTerm] = useState('')
   const [priceRange, setPriceRange] = useState([0, 100])
   const [maxPrice, setMaxPrice] = useState(100)
+  const comparisonRef = useRef(null) // Referencja do sekcji porównania
   
   // Kategorie subskrypcji
   const categories = [
@@ -105,6 +107,16 @@ function CompareContent() {
   const clearSelection = () => {
     setSelectedSubscriptions([])
   }
+  
+  // Funkcja przewijająca do sekcji porównania
+  const scrollToComparison = () => {
+    if (comparisonRef.current) {
+      comparisonRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }
 
   return (
     <div className="min-h-screen">
@@ -113,7 +125,7 @@ function CompareContent() {
         <div className="container-custom">
           <h1 className="heading-xl text-center">Porównaj subskrypcje</h1>
           <p className="text-center text-light-300 mb-8 max-w-3xl mx-auto">
-            Wybierz i porównaj oferty najlepszych serwisów subskrypcyjnych. Możesz filtrować według kategorii, ceny i wyszukiwać konkretne usługi.
+            Wybierz i porównaj oferty najlepszych serwisów subskrypcyjnych. Możesz wybrać maksymalnie <span className="font-semibold text-primary-400">4 subskrypcje</span> do porównania. Filtruj według kategorii, ceny i wyszukuj konkretne usługi.
           </p>
         </div>
       </section>
@@ -193,9 +205,9 @@ function CompareContent() {
             {/* Przyciski akcji dla wybranych subskrypcji */}
             {selectedSubscriptions.length > 0 && (
               <div className="flex items-center space-x-4">
-                <span className="text-light-300">
-                  Wybrano: {selectedSubscriptions.length}
-                </span>
+                <div className="bg-primary-500 text-white font-medium py-1 px-3 rounded-full text-sm">
+                  Wybrano {selectedSubscriptions.length}/4
+                </div>
                 <button
                   onClick={clearSelection}
                   className="text-red-400 hover:text-red-300 text-sm"
@@ -218,7 +230,7 @@ function CompareContent() {
                   <div 
                     key={subscription.id}
                     className={`card cursor-pointer transition-all duration-200 ${
-                      isSelected ? 'ring-2 ring-primary' : ''
+                      isSelected ? 'ring-2 ring-primary bg-primary-500/10 transform scale-[1.02] shadow-lg shadow-primary-500/20' : ''
                     }`}
                     onClick={() => toggleSubscription(subscription)}
                   >
@@ -300,13 +312,59 @@ function CompareContent() {
           
           {/* Tabela porównawcza */}
           {selectedSubscriptions.length > 0 && (
-            <div className="mt-8">
+            <div ref={comparisonRef} className="mt-8">
               <h2 className="heading-lg mb-6">Porównanie wybranych subskrypcji</h2>
               <ComparisonTable subscriptions={selectedSubscriptions} />
             </div>
           )}
         </div>
       </div>
+      
+      {/* Sticky Compare Bar */}
+      {selectedSubscriptions.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-dark-200 border-t border-primary-900 shadow-lg transform transition-all duration-300 z-50">
+          <div className="container-custom py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="bg-primary-500 text-white font-medium py-1 px-3 rounded-full text-sm">
+                  Wybrano {selectedSubscriptions.length}/4
+                </div>
+                
+                {/* Miniaturki wybranych platform */}
+                <div className="hidden md:flex items-center space-x-2">
+                  {selectedSubscriptions.map(sub => (
+                    <div key={sub.id} className="relative group">
+                      <div className="w-8 h-8 bg-dark-100 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold">{sub.provider[0]}</span>
+                      </div>
+                      <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-dark-100 text-white text-xs py-1 px-2 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                        {sub.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={clearSelection}
+                  className="text-light-400 hover:text-red-400 text-sm"
+                >
+                  Wyczyść
+                </button>
+                
+                <button
+                  onClick={scrollToComparison}
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg flex items-center transition-colors"
+                >
+                  <span className="mr-2">Pokaż porównanie</span>
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
